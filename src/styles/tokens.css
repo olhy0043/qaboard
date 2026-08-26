@@ -1,0 +1,25 @@
+:root {
+  --navy: #1a2840;
+  --blue: #2563eb;
+  --violet: #7c3aed;
+  --bg: #f9fafb;
+  --white: #ffffff;
+  --amber: #f59e0b;
+  --emerald: #10b981;
+  --badge-waiting: #b45309;
+  --badge-done: #047857;
+  --red: #ef4444;
+  --gray-700: #374151;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
+
+  /* 이전에 컴포넌트별로 하드코딩되어 있던 값을 토큰으로 승격 (design-sync 사전 점검 보정) */
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  --role-tag-bg: #f3e8ff;
+  --overlay-scrim: rgba(26, 40, 64, 0.5);
+  --overlay-scrim-soft: rgba(26, 40, 64, 0.4);
+}

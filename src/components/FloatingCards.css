@@ -1,0 +1,91 @@
+.floating-cards {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  height: 420px;
+  z-index: 2;
+}
+
+.fcard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  max-width: 300px;
+  position: absolute;
+}
+
+.fcard-q {
+  top: 0;
+  right: 0;
+}
+
+.fcard-a {
+  top: 190px;
+  right: -40px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fcard-q {
+    animation: float1 4s ease-in-out infinite;
+  }
+  .fcard-a {
+    animation: float1 4s ease-in-out infinite 0.3s;
+  }
+}
+
+.fcard-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.fcard-text {
+  font-size: 0.9375rem;
+  color: var(--navy);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.fcard-meta {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.connector {
+  position: absolute;
+  width: 2px;
+  height: 170px;
+  top: 130px;
+  right: -10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.15));
+}
+
+@media (max-width: 1024px) {
+  .floating-cards {
+    width: 100%;
+    height: auto;
+    display: flex;
+    gap: 16px;
+  }
+  .fcard {
+    position: relative;
+    top: 0 !important;
+    right: 0 !important;
+    max-width: none;
+    flex: 1;
+    animation: none !important;
+  }
+  .connector {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .floating-cards {
+    flex-direction: column;
+  }
+}

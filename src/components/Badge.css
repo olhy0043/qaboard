@@ -1,0 +1,18 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.badge-waiting {
+  background: var(--badge-waiting);
+}
+
+.badge-done {
+  background: var(--badge-done);
+}

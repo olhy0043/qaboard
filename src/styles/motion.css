@@ -1,0 +1,40 @@
+/* Reduced-motion aware keyframes shared by main hero, floating cards, skeletons, spinners.
+   Any component using these MUST wrap the animation declaration in the same
+   @media (prefers-reduced-motion: no-preference) guard used here (헌법 원칙 VII). */
+
+@keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float1 {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
