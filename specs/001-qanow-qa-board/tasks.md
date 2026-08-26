@@ -331,27 +331,33 @@ Phase 5(Supabase)를 시작하지 않는다.**
   - 요구사항: 없음(인프라)
   - design.md: 없음
   - 파일: `package.json`, `.env.local.example`
-  - 검증: 환경변수 누락 시 빌드 실패로 즉시 감지
+  - 검증: 패키지 설치 완료(`npm install` 성공), 빌드 통과(2026-08-26). 실제
+    `.env.local`은 사용자가 자신의 Supabase 프로젝트 값으로 생성해야 함 — 미체크 유지
 - [ ] T045 Supabase 클라이언트 초기화 (`src/lib/supabaseClient.ts`)
   - 요구사항: 없음(인프라)
   - design.md: 없음
   - 파일: `src/lib/supabaseClient.ts`
-  - 검증: 클라이언트 초기화 후 헬스체크 쿼리 성공
+  - 검증: 코드 작성 및 빌드/린트 통과 확인(2026-08-26). 헬스체크 쿼리는 실제 프로젝트
+    연결 후에만 가능 — 미체크 유지
 - [ ] T046 [P] `profiles` 테이블 마이그레이션 (id, email, role)
   - 요구사항: Spec §Key Entities(회원/관리자)
   - design.md: 없음
   - 파일: `supabase/migrations/0001_profiles.sql`
-  - 검증: 마이그레이션 적용 후 `role` 컬럼이 `member`/`admin` 값만 허용
+  - 검증: SQL 작성 완료(role CHECK 제약, 회원가입 시 프로필 자동 생성 트리거 포함,
+    2026-08-26). 실제 프로젝트에 적용 후 라이브 검증 필요 — 미체크 유지
 - [ ] T047 [P] `questions` 테이블 마이그레이션 (id, title, content, author_id, status, created_at, updated_at)
   - 요구사항: Spec §Key Entities(질문), FR-009
   - design.md: 없음
   - 파일: `supabase/migrations/0002_questions.sql`
-  - 검증: `status` 기본값이 "답변대기"로 삽입됨
+  - 검증: SQL 작성 완료, `status` 기본값 `'waiting'` + T079의 제목/내용 길이
+    CHECK 제약 포함(2026-08-26). 라이브 적용 검증 필요 — 미체크 유지
 - [ ] T048 [P] `answers` 테이블 마이그레이션 (id, question_id, content, admin_id, created_at, updated_at)
   - 요구사항: Spec §Key Entities(답변)
   - design.md: 없음
   - 파일: `supabase/migrations/0003_answers.sql`
-  - 검증: `question_id` unique 제약으로 질문당 답변 1건만 허용
+  - 검증: SQL 작성 완료, `question_id` UNIQUE 제약 + 답변 등록 시 질문 status를
+    `'done'`으로 갱신하는 트리거 + T079 답변 길이 CHECK 제약 포함(2026-08-26).
+    라이브 적용 검증 필요 — 미체크 유지
 - [ ] T049 RLS 정책 — 회원은 본인 질문만 조회/수정/삭제하며, 답변완료 질문은 수정·삭제 불가
   - 요구사항: FR-010, FR-013, FR-014, FR-015, FR-021, 헌법 원칙 II
   - design.md: 없음
@@ -360,28 +366,40 @@ Phase 5(Supabase)를 시작하지 않는다.**
     UPDATE·DELETE 정책에는 추가로 `status <> '답변완료'` 조건을 명시한다(FR-015).
     관리자가 답변을 등록해 상태가 변경된 이후에는 이 조건에 의해 소유자 본인의
     요청도 데이터 계층에서 거부되어야 한다.
-  - 검증: (1) 타 회원 UID로 API 직접 호출 시 거부(SC-005), (2) 본인 소유이지만
-    상태가 "답변완료"인 질문에 대한 UPDATE/DELETE 직접 API 호출이 거부됨(FR-015)
+  - 검증: SQL 작성 완료 — SELECT/INSERT/UPDATE/DELETE 정책 모두 `author_id =
+    auth.uid()` + UPDATE/DELETE에 `status <> 'done'` 조건 포함(2026-08-26).
+    (1) 타 회원 UID 직접 호출 거부, (2) 답변완료 질문 UPDATE/DELETE 거부는
+    라이브 프로젝트 연결 후 검증 필요 — 미체크 유지
 - [ ] T050 RLS 정책 — 관리자는 전체 질문 조회 + 답변 작성/수정만 가능
   - 요구사항: FR-011, FR-016, FR-019, 헌법 원칙 II
   - design.md: 없음
   - 파일: `supabase/migrations/0005_rls_questions_admin.sql`
-  - 검증: admin 역할 토큰으로 전체 질문 SELECT 성공
+  - 검증: SQL 작성 완료 — `profiles.role='admin'` 확인 후 전체 SELECT 허용,
+    UPDATE 정책은 부여하지 않고 T048의 트리거로만 상태 전이(최소 권한,
+    2026-08-26). 라이브 검증 필요 — 미체크 유지
 - [ ] T051 RLS 정책 — 회원의 답변 작성/수정 차단
   - 요구사항: FR-020, 헌법 원칙 II
   - design.md: 없음
   - 파일: `supabase/migrations/0006_rls_answers_block_member.sql`
-  - 검증: member 역할 토큰으로 answers INSERT/UPDATE 시도 시 거부됨
+  - 검증: SQL 작성 완료 — INSERT/UPDATE 정책 모두 `profiles.role='admin'` 확인
+    필수(2026-08-26). member 토큰으로 직접 API 호출 시 거부는 라이브 검증
+    필요 — 미체크 유지
 - [ ] T052 관리자 역할 판별 로직 (`src/lib/auth.ts`)
   - 요구사항: FR-003
   - design.md: §6
   - 파일: `src/lib/auth.ts`
-  - 검증: `profiles.role` 조회 결과로 UI 분기가 결정됨
+  - 검증: `fetchRole()` 함수 작성 완료, 빌드/린트 통과(2026-08-26). 실제
+    `profiles` 조회 결과 검증은 라이브 연결 후 필요 — 미체크 유지
 - [ ] T053 mockSession → 실제 Supabase 세션 교체 (`src/hooks/useAuth.ts`)
   - 요구사항: FR-002, FR-003
   - design.md: §6
   - 파일: `src/hooks/useAuth.ts`
-  - 검증: `src/mocks/mockSession.ts` 참조가 프로덕션 경로에서 모두 제거됨
+  - 검증: `mockSession.tsx`와 동일한 인터페이스(`session`/`requestLogin`/
+    `closeLoginModal`/`login`/`logout`)로 `AuthProvider`/`useAuth` 작성 완료,
+    빌드/린트/테스트 통과(2026-08-26). **아직 `Layout.tsx`/`App.tsx`의 import를
+    `mockSession` → `useAuth`로 교체하지 않음**(T056에서 LoginModal의
+    `login(email)` → `login(email,password)` 시그니처 변경과 함께 일괄 전환
+    예정) — 미체크 유지
 
 **Checkpoint**: 데이터 계층 준비 완료
 
@@ -635,7 +653,10 @@ Task: "StatePanel 컴포넌트 in src/components/StatePanel.tsx"
   - design.md: 없음
   - 파일: `supabase/migrations/0002_questions.sql`, `supabase/migrations/0003_answers.sql`
     (T047/T048에 제약 추가로 병합 가능)
-  - 검증: 공백만 입력하거나 길이를 초과한 값으로 직접 API INSERT/UPDATE 시도 시 DB가 거부
+  - 검증: `questions_title_length`/`questions_content_length`/`answers_content_length`
+    CHECK 제약(`char_length(btrim(...)) between 1 and N`)을 T047/T048에 직접
+    포함시켜 작성 완료(2026-08-26). 공백만 입력·길이 초과 값의 실제 DB 거부는
+    라이브 프로젝트 연결 후 검증 필요 — 미체크 유지
 - [ ] T080 저장 액션 중 세션 만료가 감지되면 저장을 거부하고 로그인 안내로 전환하는 처리
   추가 per Spec §Edge Cases("로그인 세션이 만료된 상태에서 회원이 저장을 시도하면") (missing)
   - 요구사항: Spec §Edge Cases, FR-022
